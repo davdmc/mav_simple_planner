@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>mav_simple_planner</name>
+  <version>0.1.0</version>
+  <description>Simple mission planner for MAVs</description>
+
+  <maintainer email="davidmorillacabello@gmail.com">David Morilla Cabello</maintainer>
+
+  <license>None</license>
+
+  <buildtool_depend>message_generation</buildtool_depend>
+  <buildtool_depend>message_runtime</buildtool_depend>
+  <buildtool_depend>catkin</buildtool_depend>
+  <buildtool_depend>catkin_simple</buildtool_depend>
+
+
+  <depend>roscpp</depend>
+
+  <depend>message_generation</depend>
+  <depend>message_runtime</depend>
+  <depend>eigen_catkin</depend>
+  <depend>eigen_checks</depend>
+  <depend>std_msgs</depend>
+  <depend>trajectory_msgs</depend>
+  <depend>mav_msgs</depend>
+  <depend>visualization_msgs</depend>
+  <depend>mav_trajectory_generation_ros</depend>
+</package>

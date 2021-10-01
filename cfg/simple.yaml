@@ -1,0 +1,10 @@
+############          COMMON PARAMETERS        ############
+planner:
+  dt: 0.05                    # [s] this should be greater or equal to interpolation/sampling_dt
+
+interpolation:
+  max_v: 18.0                 # [m/s]
+  max_a: 10.0                # [m/s2]
+  max_ang_v: 2.0             # [rad/s]
+  max_ang_a: 2.0             # [rad/s2]
+  sampling_dt: 0.05          # [s]

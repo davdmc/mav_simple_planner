@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="mav_name"       default="firefly"/>
+
+  <group ns="$(arg mav_name)">
+    <!--  Planner Node -->
+    <node name="mav_simple_planner" pkg="mav_simple_planner" type="mav_simple_planner" respawn="false" output="screen" clear_params="true">
+      <!-- ROS parameters -->
+      <rosparam file="$(find mav_simple_planner)/cfg/simple.yaml" command="load"/>
+    </node>    
+  </group>
+  
+  
+</launch>
