@@ -14,6 +14,7 @@
 #include "mav_simple_planner/ServiceCommandPoint.h"
 #include "mav_simple_planner/ServiceCommandInit.h"
 #include "mav_simple_planner/ServiceCommandCoverage.h"
+#include "mav_simple_planner/ServiceCommandCoverageFromBB.h"
 #include <mav_simple_planner/polynomial_interpolator.hpp>
 
 namespace mav_simple_planner {
@@ -52,13 +53,15 @@ private:
    */
   void initRos();
 
+  void commandCoverageFromBB(double x_min, double x_max, double y_min, double y_max, double z_min, double z_max);
   /**
    * @brief Series of callbacks
    */
-  bool commandCircleCallback(mav_simple_planner::ServiceCommandCircleRequest& req, mav_simple_planner::ServiceCommandCircleResponse& res);
-  bool commandPointCallback(mav_simple_planner::ServiceCommandPointRequest& req, mav_simple_planner::ServiceCommandPointResponse& res);
-  bool commandInitCallback(mav_simple_planner::ServiceCommandInitRequest& req, mav_simple_planner::ServiceCommandInitResponse& res);
-  bool commandCoverageCallback(mav_simple_planner::ServiceCommandCoverageRequest& req, mav_simple_planner::ServiceCommandCoverageResponse& res);
+  bool commandCircleCallback(mav_simple_planner::ServiceCommandCircle::Request& req, mav_simple_planner::ServiceCommandCircle::Response& res);
+  bool commandPointCallback(mav_simple_planner::ServiceCommandPoint::Request& req, mav_simple_planner::ServiceCommandPoint::Response& res);
+  bool commandInitCallback(mav_simple_planner::ServiceCommandInit::Request& req, mav_simple_planner::ServiceCommandInit::Response& res);
+  bool commandCoverageCallback(mav_simple_planner::ServiceCommandCoverage::Request& req, mav_simple_planner::ServiceCommandCoverage::Response& res);
+  bool commandCoverageFromBBCallback(mav_simple_planner::ServiceCommandCoverageFromBB::Request& req, mav_simple_planner::ServiceCommandCoverageFromBB::Response& res);
 
   void commandTimerCallback(const ros::TimerEvent&);
 
@@ -82,6 +85,7 @@ protected:
   ros::ServiceServer command_point_srv_;
   ros::ServiceServer command_init_srv_;
   ros::ServiceServer command_coverage_srv_;
+  ros::ServiceServer command_coverage_from_bb_srv_;
 //   ros::ServiceServer command_zig_zag_srv_;
 
   // Timer to sample waypoints and publish them 

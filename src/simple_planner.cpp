@@ -1,8 +1,12 @@
 #include "mav_simple_planner/simple_planner.hpp"
 
+
 #include <std_msgs/Time.h>
 
 #include <visualization_msgs/MarkerArray.h>
+
+#include <Eigen/Dense>
+#include <Eigen/Geometry> 
 
 #include <trajectory_msgs/MultiDOFJointTrajectory.h>
 
@@ -77,6 +81,7 @@ void Planner::initRos() {
     command_init_srv_ = nh_.advertiseService("command_init", &Planner::commandInitCallback, this);
     command_point_srv_ = nh_.advertiseService("command_point", &Planner::commandPointCallback, this);
     command_coverage_srv_ = nh_.advertiseService("command_coverage", &Planner::commandCoverageCallback, this);
+    command_coverage_from_bb_srv_ = nh_.advertiseService("command_coverage_from_bb", &Planner::commandCoverageFromBBCallback, this);
 
     // Initialize timers
 
@@ -230,14 +235,14 @@ bool Planner::commandPointCallback(mav_simple_planner::ServiceCommandPointReques
 
 
 bool Planner::commandCoverageCallback(mav_simple_planner::ServiceCommandCoverageRequest& req, mav_simple_planner::ServiceCommandCoverageResponse& res){
-    double center_x = req.x;
-    double center_y = req.y;
-    double center_z = req.z;
+    double x = req.x;
+    double y = req.y;
+    double z = req.z;
     double side_x = req.side_x;
     double side_y = req.side_y;
     double interval = req.interval;
     int softness = 5;
-    double inter_point = (2 * side_y) / softness;
+    double inter_point = side_y / softness;
 
     double yaw = 0;
 
@@ -251,18 +256,18 @@ bool Planner::commandCoverageCallback(mav_simple_planner::ServiceCommandCoverage
         for(size_t j=0; j<= softness; j++)
         {
             path_waypoints_.push_back(Eigen::Vector4d(
-                center_x - side_x + interval * 2*i,
-                center_y - side_y + j*inter_point,
-                center_z,
+                x + interval * 2*i,
+                y + j * inter_point,
+                z,
                 yaw));
         }
 
         for(size_t j=0; j<= softness; j++)
         {
             path_waypoints_.push_back(Eigen::Vector4d(
-                center_x - side_x + interval * (2*i+1),
-                center_y + side_y - j*inter_point,
-                center_z,
+                x + interval * (2*i+1),
+                y + side_y - j * inter_point,
+                z,
                 yaw));
         }
     }
@@ -270,6 +275,54 @@ bool Planner::commandCoverageCallback(mav_simple_planner::ServiceCommandCoverage
     startPlanning();
     
 }
+
+bool Planner::commandCoverageFromBBCallback(mav_simple_planner::ServiceCommandCoverageFromBB::Request& req, mav_simple_planner::ServiceCommandCoverageFromBB::Response& res){
+    
+    double x = req.x_min;
+    double y = req.y_min;
+    double z = req.z_max;
+    assert(req.x_max > req.x_min);
+    assert(req.y_max > req.y_min);
+    assert(req.z_max > req.z_min);
+    double rotation = -req.rotation;
+    Eigen::Quaterniond rotation_quat;
+    rotation_quat = Eigen::AngleAxis<double>(rotation * M_PI / -180.0,
+                                        Eigen::Vector3d::UnitZ());
+    double side_x = req.x_max - req.x_min;
+    double side_y = req.y_max - req.y_min;
+    double interval = req.interval;
+    int softness = 5;
+    double inter_point = side_y / softness;
+    double yaw = 0;
+
+    int num_paths = int(side_x / (interval));
+
+    ROS_INFO("[Simple planner] Commanding BB coverage: \nOrigin: x=%f y=%f z=%f\nSides: x=%f y=%f\nInterval: %f Inter point: %f Num paths: %d", x,y,z,side_x,side_y,interval, inter_point, num_paths);
+    path_waypoints_.clear();
+
+    for (size_t i = 0; i <= num_paths/2; i++)
+    {
+
+        for(size_t j=0; j<= softness; j++)
+        {
+            Eigen::Vector3d point(x + interval * 2*i, y + j * inter_point, z);
+            Eigen::Vector3d rotated_point = rotation_quat * point;
+            path_waypoints_.push_back(Eigen::Vector4d(rotated_point.x(),rotated_point.y(),rotated_point.z(), yaw));
+        }
+
+        for(size_t j=0; j<= softness; j++)
+        {
+            Eigen::Vector3d point(x + interval * (2*i+1), y + side_y - j * inter_point, z);
+            Eigen::Vector3d rotated_point = rotation_quat * point;
+            path_waypoints_.push_back(Eigen::Vector4d(rotated_point.x(),rotated_point.y(),rotated_point.z(), yaw));
+
+        }
+    }
+
+    startPlanning();
+    
+}
+
 
 void Planner::commandTimerCallback(const ros::TimerEvent&) {
 

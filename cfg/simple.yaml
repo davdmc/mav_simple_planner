@@ -1,7 +1,8 @@
 ############          COMMON PARAMETERS        ############
 planner:
   dt: 0.05                    # [s] this should be greater or equal to interpolation/sampling_dt
-
+  fixed_yaw: false            # Fix the yaw to 0
+  
 interpolation:
   max_v: 18.0                 # [m/s]
   max_a: 10.0                # [m/s2]
