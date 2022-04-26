@@ -4,8 +4,8 @@ planner:
   fixed_yaw: false            # Fix the yaw to 0
   
 interpolation:
-  max_v: 18.0                 # [m/s]
-  max_a: 10.0                # [m/s2]
-  max_ang_v: 2.0             # [rad/s]
-  max_ang_a: 2.0             # [rad/s2]
+  max_v: 15.0                 # [m/s]
+  max_a: 15.0                 # [m/s2]
+  max_ang_v: 8.0             # [rad/s]
+  max_ang_a: 8.0             # [rad/s2]
   sampling_dt: 0.05          # [s]

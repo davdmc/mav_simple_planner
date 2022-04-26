@@ -16,6 +16,7 @@
 #include "mav_simple_planner/ServiceCommandCoverage.h"
 #include "mav_simple_planner/ServiceCommandCoverageFromBB.h"
 #include <mav_simple_planner/polynomial_interpolator.hpp>
+#include <mutex>
 
 namespace mav_simple_planner {
 /*!
@@ -93,9 +94,13 @@ protected:
 
   // Current requested path
   WaypointsList path_waypoints_;
-
+  bool running_;
+  
   // Interpolator of the path once a coverage plan has been found
   std::unique_ptr<PolynomialInterpolator> poly_interpolator_;
+
+  // Goals mutex
+  std::recursive_mutex goal_mutex_;
 
   // Parameters for the trajectory interpolation
   double dt_; //[s] this should be greater or equal to interpolation/sampling_dt
